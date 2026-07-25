@@ -2051,7 +2051,10 @@ async function handleAuthenticatedSession(session){
   const user = session.user;
   currentAuthEmail = user.email;
   const profile = await fetchProfile(user.id);
-  if (!profile){
+  if (!profile || !profile.name || !profile.national_id){
+    // Either the profile row doesn't exist yet, or it does but was never filled in — this
+    // happens whenever email confirmation was required, since the original signup submission
+    // couldn't save name/national_id without an active session at that moment.
     pendingAuthUser = user;
     renderLoginStage('complete-profile');
     return;
